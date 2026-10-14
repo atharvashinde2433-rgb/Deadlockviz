@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DeadlockViz — Banker's Algorithm</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔒</text></svg>"/>
+</head>
+<body>
+
+<!-- ══ NAVBAR ══════════════════════════════════════════════ -->
+<nav class="navbar">
+  <a href="index.html" class="nav-brand">
+    <span class="nav-brand-icon">🔒</span> DeadlockViz
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html">🏠 Home</a></li>
+    <li><a href="theory.html">📖 Theory</a></li>
+    <li><a href="simulator.html">🔗 RAG Simulator</a></li>
+    <li><a href="bankers.html" class="active">🏦 Banker's Algorithm</a></li>
+  </ul>
+  <button class="hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="page-wrap">
+<!-- ══ PAGE HERO ═══════════════════════════════════════════ -->
+<section style="padding:3.5rem 1.5rem 2.5rem;background:var(--surface);border-bottom:1px solid var(--border);text-align:center">
+  <div class="container-sm">
+    <span class="badge badge-success badge-lg" style="margin-bottom:1rem">🏦 DEADLOCK AVOIDANCE</span>
+    <h1 style="font-size:clamp(2rem,5vw,2.8rem);font-weight:900;margin-bottom:.8rem;
+      background:linear-gradient(135deg,#c7d2fe,#818cf8,#ec4899);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">
+      Banker's Algorithm
+    </h1>
+    <p style="color:var(--muted);font-size:.95rem;max-width:620px;margin:0 auto">
+      Simulate Dijkstra's classic deadlock avoidance algorithms: the <strong>Safety Algorithm</strong> to identify safe states
+      and the <strong>Resource-Request Algorithm</strong> to evaluate immediate allocation requests.
+    </p>
+  </div>
+</section>
+
+<!-- ══ BANKER'S SIMULATOR ══════════════════════════════════ -->
+<section class="section-sm">
+  <div class="container">
+    
+    <!-- Controls Card -->
+    <div class="card mb-3">
+      <div style="display:flex;flex-wrap:wrap;gap:1.5rem;align-items:flex-end;justify-content:space-between;">
+        
+        <div style="display:flex;flex-wrap:wrap;gap:1.2rem;align-items:flex-end;">
+          <div class="form-group" style="margin-bottom:0;min-width:140px;">
+            <label class="form-label" for="b-num-proc">Number of Processes (2-6)</label>
+            <input type="number" id="b-num-proc" class="form-control" min="2" max="6" value="5"/>
+          </div>
+
+          <div class="form-group" style="margin-bottom:0;min-width:140px;">
+            <label class="form-label" for="b-num-res">Number of Resources (1-5)</label>
+            <input type="number" id="b-num-res" class="form-control" min="1" max="5" value="3"/>
+          </div>
+
+          <div class="form-group" style="margin-bottom:0;min-width:190px;">
+            <label class="form-label" for="b-avail">Available Vector (comma-separated)</label>
+            <input type="text" id="b-avail" class="form-control" placeholder="e.g. 3, 3, 2"/>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;">
+          <button id="b-run" class="btn btn-primary font-bold">
+            ▶ Run Safety Check
+          </button>
+          <button id="b-example-safe" class="btn btn-outline">
+            📚 Silberschatz Safe Example
+          </button>
+          <button id="b-example-unsafe" class="btn btn-outline" style="border-color:rgba(239,68,68,.4);color:#fca5a5;">
+            ⚠️ Unsafe Example
+          </button>
+          <button id="b-reset" class="btn btn-ghost">
+            🔄 Reset
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Matrix Tables -->
+    <div class="grid grid-2 mt-3" style="gap:1.5rem;">
+      <!-- Allocation Matrix -->
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem;">
+          <h3 style="font-size:1.05rem;font-weight:700;color:var(--primary-light);">
+            📥 Allocation Matrix
+          </h3>
+          <span class="badge badge-primary">Current Holding</span>
+        </div>
+        <p class="text-muted mb-2" style="font-size:.82rem;">
+          Resources currently allocated to each process.
+        </p>
+        <div id="b-alloc-table" class="overflow-x"></div>
+      </div>
+
+      <!-- Max Matrix -->
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem;">
+          <h3 style="font-size:1.05rem;font-weight:700;color:var(--accent);">
+            🎯 Maximum Demand Matrix
+          </h3>
+          <span class="badge badge-accent">Peak Demand</span>
+        </div>
+        <p class="text-muted mb-2" style="font-size:.82rem;">
+          Maximum resources demanded by each process to complete execution.
+        </p>
+        <div id="b-max-table" class="overflow-x"></div>
+      </div>
+    </div>
+
+    <!-- Safety Results Display Area -->
+    <div id="b-result" class="card mt-4 hidden">
+      <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:1rem;color:var(--text);">
+        Safety Algorithm Execution Results
+      </h3>
+      <div id="b-output"></div>
+    </div>
+
+    <!-- ══ RESOURCE-REQUEST SIMULATOR CARD ═══════════════════ -->
+    <div class="card mt-4" style="border:1.5px solid rgba(99,102,241,.4);background:var(--card);">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem;flex-wrap:wrap;gap:.5rem;">
+        <div>
+          <h3 style="font-size:1.1rem;font-weight:700;color:var(--primary-light);display:flex;align-items:center;gap:.5rem;">
+            <span>⚡</span> Resource-Request Algorithm Simulator
+          </h3>
+          <p class="text-muted" style="font-size:.84rem;margin-top:.25rem;">
+            Test if an immediate resource request by a process can be safely granted without violating safety conditions.
+          </p>
+        </div>
+        <span class="badge badge-primary">Dijkstra's Request Check</span>
+      </div>
+
+      <!-- Request Form -->
+      <div style="background:var(--surface);padding:1.2rem;border-radius:var(--r);border:1px solid var(--border);margin-bottom:1rem;">
+        <div style="display:flex;flex-wrap:wrap;gap:1.5rem;align-items:flex-end;">
+          
+          <div class="form-group" style="margin-bottom:0;min-width:160px;">
+            <label class="form-label" for="b-req-proc">Requesting Process</label>
+            <select id="b-req-proc" class="form-control">
+              <option value="0">Process P1</option>
+            </select>
+          </div>
+
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label">Requested Vector</label>
+            <div id="b-req-inputs"></div>
+          </div>
+
+          <button id="b-req-eval" class="btn btn-primary font-bold">
+            ▶ Evaluate Request
+          </button>
+        </div>
+
+        <!-- Quick Test Scenarios -->
+        <div class="mt-3 pt-2" style="border-top:1px solid var(--border);display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;">
+          <span class="text-muted" style="font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;">Quick Textbook Trials:</span>
+          <button id="b-req-quick-safe" class="btn btn-outline btn-sm">
+            ✅ P2 Requests [1, 0, 2] (Safe)
+          </button>
+          <button id="b-req-quick-wait" class="btn btn-outline btn-sm">
+            ⏳ P1 Requests [0, 4, 0] (Wait — Exceeds Avail)
+          </button>
+          <button id="b-req-quick-unsafe" class="btn btn-outline btn-sm">
+            ⚠️ P5 Requests [3, 3, 0] (Wait — Unsafe State)
+          </button>
+        </div>
+      </div>
+
+      <!-- Request Output Box -->
+      <div id="b-req-result" class="hidden">
+        <div id="b-req-output"></div>
+        <button id="b-req-apply" class="btn btn-success font-bold mt-2 hidden">
+          ✅ Apply Request &amp; Commit to System Matrices
+        </button>
+      </div>
+    </div>
+
+    <!-- Algorithm Explanation Card -->
+    <div class="card mt-4" style="background:var(--surface);">
+      <h4 style="font-size:.95rem;font-weight:700;margin-bottom:.6rem;color:var(--text);">
+        💡 How Banker's Algorithms Work (Safety &amp; Resource-Request)
+      </h4>
+      <div class="grid grid-2" style="gap:1.5rem;margin-top:.8rem;">
+        <div>
+          <strong style="color:var(--primary-light);font-size:.88rem;">1. Safety Algorithm:</strong>
+          <p style="font-size:.82rem;color:var(--muted);line-height:1.7;margin-top:.3rem;">
+            • Calculates <code style="color:var(--primary-light)">Need[i][j] = Max[i][j] - Alloc[i][j]</code>.<br/>
+            • Sets <code style="color:var(--primary-light)">Work = Available</code> and searches for unfinished $P_i$ where <code style="color:var(--primary-light)">Need[i] ≤ Work</code>.<br/>
+            • When $P_i$ completes, releases resources: <code style="color:var(--primary-light)">Work = Work + Alloc[i]</code>.<br/>
+            • If all processes finish, the system is in a safe state with a safe execution sequence.
+          </p>
+        </div>
+        <div>
+          <strong style="color:var(--accent);font-size:.88rem;">2. Resource-Request Algorithm:</strong>
+          <p style="font-size:.82rem;color:var(--muted);line-height:1.7;margin-top:.3rem;">
+            • <strong>Step 1:</strong> If <code style="color:var(--primary-light)">Request ≤ Need[i]</code>, proceed; otherwise raise error (exceeded maximum claim).<br/>
+            • <strong>Step 2:</strong> If <code style="color:var(--primary-light)">Request ≤ Available</code>, proceed; otherwise $P_i$ must wait.<br/>
+            • <strong>Step 3:</strong> Pretend to allocate (<code style="color:var(--primary-light)">Avail -= Req</code>, <code style="color:var(--primary-light)">Alloc[i] += Req</code>, <code style="color:var(--primary-light)">Need[i] -= Req</code>) and test safety.<br/>
+            • If safe: grant request immediately. If unsafe: $P_i$ must wait and previous state is restored.
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══ FOOTER ═══════════════════════════════════════════════ -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div>
+      <div class="footer-brand">🔒 DeadlockViz</div>
+      <div class="footer-text">Deadlock Detection &amp; Visualization System · OS Education</div>
+    </div>
+    <div class="footer-links">
+      <a href="index.html">Home</a>
+      <a href="theory.html">Theory</a>
+      <a href="simulator.html">Simulator</a>
+      <a href="bankers.html">Banker's</a>
+    </div>
+  </div>
+</footer>
+</div>
+
+<script src="js/utils.js"></script>
+<script src="js/bankers.js"></script>
+</body>
+</html>

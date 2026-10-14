@@ -1,0 +1,482 @@
+{% extends "base.html" %}
+
+{% block title %}DeadlockViz — Theory &amp; Concepts{% endblock %}
+
+{% block content %}
+<!-- ══ PAGE HERO ═══════════════════════════════════════════ -->
+<section style="padding:4rem 1.5rem 3rem;background:var(--surface);border-bottom:1px solid var(--border);text-align:center">
+  <div class="container-sm">
+    <span class="badge badge-primary badge-lg" style="margin-bottom:1rem">📖 THEORY &amp; CONCEPTS</span>
+    <h1 style="font-size:clamp(2rem,5vw,3rem);font-weight:900;margin-bottom:1rem;
+      background:linear-gradient(135deg,#c7d2fe,#818cf8,#ec4899);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">
+      Understanding Deadlock
+    </h1>
+    <p style="color:var(--muted);font-size:1rem;max-width:560px;margin:0 auto">
+      A comprehensive guide to deadlock in operating systems —
+      what it is, why it happens, and how to handle it.
+    </p>
+  </div>
+</section>
+
+<!-- ══ WHAT IS DEADLOCK ════════════════════════════════════ -->
+<section class="section">
+  <div class="container">
+    <div class="section-tag">FUNDAMENTALS</div>
+    <h2 class="section-title">What Is a Deadlock?</h2>
+    <p class="section-sub">
+      A <strong style="color:var(--text)">deadlock</strong> is a situation where a set of processes are permanently
+      blocked because each process is holding a resource and waiting to acquire
+      a resource held by another process in the set.
+    </p>
+
+    <div class="grid grid-auto-3 mt-4" data-anim>
+      <div class="card card-hover">
+        <div class="feature-icon icon-primary" style="margin-bottom:.9rem">⏳</div>
+        <h3 style="font-weight:700;margin-bottom:.5rem">Indefinite Block</h3>
+        <p style="color:var(--muted);font-size:.875rem;line-height:1.65">
+          No process in the deadlock set ever makes progress. They are permanently
+          stuck, consuming resources without doing any useful work.
+        </p>
+      </div>
+      <div class="card card-hover">
+        <div class="feature-icon icon-danger" style="margin-bottom:.9rem">🔄</div>
+        <h3 style="font-weight:700;margin-bottom:.5rem">Circular Dependency</h3>
+        <p style="color:var(--muted);font-size:.875rem;line-height:1.65">
+          P1 waits for P2, P2 waits for P3, P3 waits for P1 — forming a cycle
+          in the resource wait graph. A cycle is a necessary condition.
+        </p>
+      </div>
+      <div class="card card-hover">
+        <div class="feature-icon icon-warning" style="margin-bottom:.9rem">📉</div>
+        <h3 style="font-weight:700;margin-bottom:.5rem">System Impact</h3>
+        <p style="color:var(--muted);font-size:.875rem;line-height:1.65">
+          CPU utilization drops to zero for the blocked processes, throughput falls,
+          and users experience unresponsive applications or services.
+        </p>
+      </div>
+    </div>
+
+    <!-- Deadlock vs Livelock -->
+    <div class="card mt-4" style="background:var(--surface)" data-anim>
+      <h3 style="font-weight:700;margin-bottom:.8rem;font-size:1.05rem">⚡ Deadlock vs Livelock vs Starvation</h3>
+      <div class="overflow-x">
+      <table class="data-table">
+        <thead><tr><th>Condition</th><th>Process State</th><th>Resource Held</th><th>Progress</th><th>Example</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="badge badge-danger">Deadlock</span></td>
+            <td>Permanently blocked</td>
+            <td>Yes — holding &amp; waiting</td>
+            <td>None forever</td>
+            <td>Dining Philosophers (all grab left fork)</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-warning">Livelock</span></td>
+            <td>Active but unproductive</td>
+            <td>Keeps changing</td>
+            <td>None (busy looping)</td>
+            <td>Two people in hallway keep sidestepping</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-accent">Starvation</span></td>
+            <td>Waiting indefinitely</td>
+            <td>No</td>
+            <td>Others make progress</td>
+            <td>Low-priority process never scheduled</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ COFFMAN CONDITIONS ══════════════════════════════════ -->
+<section class="section section-alt" id="conditions">
+  <div class="container">
+    <div class="section-tag">COFFMAN (1971)</div>
+    <h2 class="section-title">Four Necessary Conditions</h2>
+    <p class="section-sub">
+      All four conditions must hold <em>simultaneously</em> for deadlock to occur.
+      Breaking <strong style="color:var(--text)">even one</strong> prevents deadlock entirely.
+    </p>
+
+    <div class="grid grid-auto-4 mt-4" data-anim>
+      <div class="cond-card">
+        <div class="cond-num">01</div>
+        <div class="cond-icon icon-danger">🔒</div>
+        <div class="cond-title">Mutual Exclusion</div>
+        <div class="cond-desc">
+          At least one resource must be held in a non-sharable mode.
+          Only one process can use it at a time; others must wait.
+        </div>
+      </div>
+      <div class="cond-card">
+        <div class="cond-num">02</div>
+        <div class="cond-icon icon-warning">✋</div>
+        <div class="cond-title">Hold &amp; Wait</div>
+        <div class="cond-desc">
+          A process holds at least one resource while waiting to acquire
+          additional resources currently held by other processes.
+        </div>
+      </div>
+      <div class="cond-card">
+        <div class="cond-num">03</div>
+        <div class="cond-icon icon-info">🚫</div>
+        <div class="cond-title">No Preemption</div>
+        <div class="cond-desc">
+          Resources cannot be forcibly taken away from a process.
+          They are released only voluntarily after the task completes.
+        </div>
+      </div>
+      <div class="cond-card">
+        <div class="cond-num">04</div>
+        <div class="cond-icon icon-accent">🔄</div>
+        <div class="cond-title">Circular Wait</div>
+        <div class="cond-desc">
+          A set {P0,P1,…,Pn} where P0 waits for P1, P1 for P2, …, Pn waits
+          back for P0 — forming a closed circular chain of dependencies.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ RESOURCE ALLOCATION GRAPH ══════════════════════════ -->
+<section class="section" id="rag">
+  <div class="container">
+    <div class="section-tag">MODELING</div>
+    <h2 class="section-title">Resource Allocation Graph (RAG)</h2>
+    <p class="section-sub">
+      The RAG is a directed bipartite graph used to represent the state of resource
+      allocation. It's the foundation of deadlock detection.
+    </p>
+
+    <div class="grid grid-2 mt-4" style="gap:2rem;align-items:start" data-anim>
+      <div>
+        <div class="card card-sm" style="margin-bottom:1rem">
+          <h4 style="font-weight:700;margin-bottom:.7rem;color:var(--primary-light)">🔵 Process Nodes (Circles)</h4>
+          <p style="color:var(--muted);font-size:.875rem;line-height:1.65">
+            Each circle represents a process. A process can request resources and
+            hold resources assigned to it.
+          </p>
+        </div>
+        <div class="card card-sm" style="margin-bottom:1rem">
+          <h4 style="font-weight:700;margin-bottom:.7rem;color:#fbbf24">🟡 Resource Nodes (Rectangles)</h4>
+          <p style="color:var(--muted);font-size:.875rem;line-height:1.65">
+            Each rectangle represents a resource type. Dots inside the rectangle
+            indicate the number of instances of that resource.
+          </p>
+        </div>
+        <div class="card card-sm" style="margin-bottom:1rem">
+          <h4 style="font-weight:700;margin-bottom:.7rem;color:#94a3b8">━━ Request Edge (P→R, dashed)</h4>
+          <p style="color:var(--muted);font-size:.875rem;line-height:1.65">
+            Directed edge from Process to Resource: the process is requesting
+            (waiting for) that resource to become available.
+          </p>
+        </div>
+        <div class="card card-sm">
+          <h4 style="font-weight:700;margin-bottom:.7rem;color:#22c55e">━━ Assignment Edge (R→P, solid)</h4>
+          <p style="color:var(--muted);font-size:.875rem;line-height:1.65">
+            Directed edge from Resource to Process: the resource instance has been
+            allocated (assigned) to that process.
+          </p>
+        </div>
+      </div>
+      <div>
+        <div class="card" style="background:var(--surface)">
+          <h4 style="font-weight:700;margin-bottom:.9rem">Deadlock Detection Rule</h4>
+          <p style="color:var(--muted);font-size:.875rem;margin-bottom:1rem;line-height:1.7">
+            <strong style="color:var(--text)">For single-instance resources:</strong><br/>
+            A deadlock exists if and only if the RAG contains a cycle.
+          </p>
+          <p style="color:var(--muted);font-size:.875rem;margin-bottom:1rem;line-height:1.7">
+            <strong style="color:var(--text)">For multi-instance resources:</strong><br/>
+            A cycle is necessary but not sufficient. Use the full detection
+            algorithm (similar to Banker's safety check).
+          </p>
+          <div class="alert alert-info">
+            <span class="alert-icon">💡</span>
+            <div>The <strong>Wait-For Graph</strong> simplifies detection by eliminating resource nodes —
+            if P1→R→P2, collapse to P1→P2. Then find cycles in the process-only graph.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ STRATEGIES ══════════════════════════════════════════ -->
+<section class="section section-alt" id="strategies">
+  <div class="container">
+    <div class="section-tag">HANDLING DEADLOCK</div>
+    <h2 class="section-title">Three Main Strategies</h2>
+
+    <div class="grid grid-auto-3 mt-4" data-anim>
+      <div class="card card-hover">
+        <div class="feature-icon icon-success" style="margin-bottom:.9rem">🛡️</div>
+        <h3 style="font-weight:700;margin-bottom:.5rem">Prevention</h3>
+        <span class="badge badge-success" style="margin-bottom:.7rem">Proactive</span>
+        <p style="color:var(--muted);font-size:.875rem;line-height:1.65;margin-bottom:.8rem">
+          Eliminate at least one Coffman condition by design:
+        </p>
+        <ul style="color:var(--muted);font-size:.82rem;padding-left:1.2rem;line-height:1.8">
+          <li>Request all resources at once (eliminates Hold &amp; Wait)</li>
+          <li>Total ordering of resource types (eliminates Circular Wait)</li>
+          <li>Allow preemption of resources</li>
+        </ul>
+      </div>
+      <div class="card card-hover">
+        <div class="feature-icon icon-warning" style="margin-bottom:.9rem">🏦</div>
+        <h3 style="font-weight:700;margin-bottom:.5rem">Avoidance</h3>
+        <span class="badge badge-warning" style="margin-bottom:.7rem">Proactive</span>
+        <p style="color:var(--muted);font-size:.875rem;line-height:1.65;margin-bottom:.8rem">
+          Keep system in a <em>safe state</em> at all times:
+        </p>
+        <ul style="color:var(--muted);font-size:.82rem;padding-left:1.2rem;line-height:1.8">
+          <li>Banker's Algorithm for resource requests</li>
+          <li>Requires advance knowledge of max resource needs</li>
+          <li>Grant request only if resulting state is safe</li>
+        </ul>
+      </div>
+      <div class="card card-hover">
+        <div class="feature-icon icon-danger" style="margin-bottom:.9rem">🔧</div>
+        <h3 style="font-weight:700;margin-bottom:.5rem">Detection &amp; Recovery</h3>
+        <span class="badge badge-danger" style="margin-bottom:.7rem">Reactive</span>
+        <p style="color:var(--muted);font-size:.875rem;line-height:1.65;margin-bottom:.8rem">
+          Allow deadlocks, detect, then fix:
+        </p>
+        <ul style="color:var(--muted);font-size:.82rem;padding-left:1.2rem;line-height:1.8">
+          <li>Periodic RAG cycle detection</li>
+          <li>Recovery: terminate process(es)</li>
+          <li>Recovery: preempt &amp; rollback resources</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Comparison table -->
+    <div class="overflow-x mt-4" data-anim>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Strategy</th>
+            <th>Runtime Overhead</th>
+            <th>Resource Utilization</th>
+            <th>Starvation Risk</th>
+            <th>Knowledge Required</th>
+            <th>Practical Usage</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Prevention</strong></td>
+            <td><span class="badge badge-success">Low</span></td>
+            <td><span class="badge badge-danger">Poor</span></td>
+            <td><span class="badge badge-warning">Medium</span></td>
+            <td>None special</td>
+            <td>OS/DB design constraints</td>
+          </tr>
+          <tr>
+            <td><strong>Avoidance (Banker's)</strong></td>
+            <td><span class="badge badge-warning">Medium</span></td>
+            <td><span class="badge badge-warning">Moderate</span></td>
+            <td><span class="badge badge-success">Low</span></td>
+            <td>Max need declared ahead</td>
+            <td>Embedded / real-time systems</td>
+          </tr>
+          <tr>
+            <td><strong>Detection &amp; Recovery</strong></td>
+            <td><span class="badge badge-danger">High</span></td>
+            <td><span class="badge badge-success">Good</span></td>
+            <td><span class="badge badge-warning">Medium</span></td>
+            <td>None</td>
+            <td>General-purpose OS</td>
+          </tr>
+          <tr>
+            <td><strong>Ostrich Algorithm</strong></td>
+            <td><span class="badge badge-success">None</span></td>
+            <td><span class="badge badge-success">Best</span></td>
+            <td><span class="badge badge-danger">High</span></td>
+            <td>None</td>
+            <td>UNIX/Windows (rare deadlocks)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ══ ALGORITHMS (PSEUDOCODE) ════════════════════════════ -->
+<section class="section" id="algorithms">
+  <div class="container">
+    <div class="section-tag">PSEUDOCODE</div>
+    <h2 class="section-title">Key Algorithms</h2>
+
+    <div class="grid grid-2 mt-4" data-anim>
+      <!-- DFS cycle detection -->
+      <div>
+        <h3 style="font-weight:700;margin-bottom:.8rem">1. DFS Cycle Detection (Wait-For Graph)</h3>
+        <div class="code-block"><span class="tok-fn">function</span> <span class="tok-fn">detectCycles</span>(graph):
+  visited  = <span class="tok-fn">Set</span>()
+  recStack = <span class="tok-fn">Set</span>()
+
+  <span class="tok-kw">for each</span> node <span class="tok-kw">in</span> graph:
+    <span class="tok-kw">if</span> node <span class="tok-kw">not in</span> visited:
+      <span class="tok-kw">if</span> <span class="tok-fn">dfs</span>(node, visited, recStack):
+        <span class="tok-kw">return</span> <span class="tok-str">DEADLOCK_FOUND</span>
+
+  <span class="tok-kw">return</span> <span class="tok-str">NO_DEADLOCK</span>
+
+<span class="tok-fn">function</span> <span class="tok-fn">dfs</span>(v, visited, recStack):
+  visited.<span class="tok-fn">add</span>(v)
+  recStack.<span class="tok-fn">add</span>(v)
+
+  <span class="tok-kw">for each</span> neighbor <span class="tok-kw">in</span> adj[v]:
+    <span class="tok-kw">if</span> neighbor <span class="tok-kw">not in</span> visited:
+      <span class="tok-kw">if</span> <span class="tok-fn">dfs</span>(neighbor, ...): <span class="tok-kw">return true</span>
+    <span class="tok-kw">elif</span> neighbor <span class="tok-kw">in</span> recStack:
+      <span class="tok-kw">return true</span>  <span class="tok-cmt">// back-edge = cycle!</span>
+
+  recStack.<span class="tok-fn">remove</span>(v)
+  <span class="tok-kw">return false</span>
+</div>
+      </div>
+
+      <!-- Banker's Safety -->
+      <div>
+        <h3 style="font-weight:700;margin-bottom:.8rem">2. Banker's Safety Algorithm</h3>
+        <div class="code-block"><span class="tok-cmt">// Inputs: Allocation, Max, Available</span>
+<span class="tok-fn">function</span> <span class="tok-fn">isSafeState</span>():
+  need[i][j] = max[i][j] - alloc[i][j]
+  work   = Available[]
+  finish = [<span class="tok-num">false</span>, <span class="tok-num">false</span>, ...]  <span class="tok-cmt">// n processes</span>
+  safeSeq = []
+
+  <span class="tok-kw">repeat</span>:
+    found = <span class="tok-num">false</span>
+    <span class="tok-kw">for</span> i = <span class="tok-num">0</span> to n<span class="tok-num">-1</span>:
+      <span class="tok-kw">if</span> finish[i] == <span class="tok-num">false</span>:
+        <span class="tok-kw">if</span> need[i] &lt;= work:   <span class="tok-cmt">// can this run?</span>
+          work += alloc[i]    <span class="tok-cmt">// release resources</span>
+          finish[i] = <span class="tok-num">true</span>
+          safeSeq.<span class="tok-fn">push</span>(i)
+          found = <span class="tok-num">true</span>
+  <span class="tok-kw">until not</span> found
+
+  <span class="tok-kw">if all</span> finish[i] == <span class="tok-num">true</span>:
+    <span class="tok-kw">return</span> <span class="tok-str">SAFE</span>, safeSeq
+  <span class="tok-kw">else</span>:
+    <span class="tok-kw">return</span> <span class="tok-str">UNSAFE</span>   <span class="tok-cmt">// deadlock possible</span>
+</div>
+      </div>
+
+      <!-- Banker's Resource Request -->
+      <div>
+        <h3 style="font-weight:700;margin-bottom:.8rem">3. Banker's Resource-Request Algorithm</h3>
+        <div class="code-block"><span class="tok-cmt">// Request_i from process P_i</span>
+<span class="tok-fn">function</span> <span class="tok-fn">requestResources</span>(i, Request):
+  <span class="tok-cmt">// Step 1: Check claim limits</span>
+  <span class="tok-kw">if</span> Request &gt; Need[i]:
+    <span class="tok-kw">raise</span> Error(<span class="tok-str">"Exceeded maximum claim"</span>)
+
+  <span class="tok-cmt">// Step 2: Check resource availability</span>
+  <span class="tok-kw">if</span> Request &gt; Available:
+    <span class="tok-kw">return</span> <span class="tok-str">WAIT</span>  <span class="tok-cmt">// not enough resources now</span>
+
+  <span class="tok-cmt">// Step 3: Tentative Allocation</span>
+  Available -= Request
+  Alloc[i]  += Request
+  Need[i]   -= Request
+
+  <span class="tok-kw">if</span> <span class="tok-fn">isSafeState</span>().isSafe:
+    <span class="tok-kw">return</span> <span class="tok-str">GRANT_REQUEST</span>  <span class="tok-cmt">// allocate permanently</span>
+  <span class="tok-kw">else</span>:
+    <span class="tok-cmt">// Rollback state; P_i must wait</span>
+    Available += Request
+    Alloc[i]  -= Request
+    Need[i]   += Request
+    <span class="tok-kw">return</span> <span class="tok-str">WAIT_UNSAFE</span>
+</div>
+      </div>
+
+      <!-- Holt's Graph Reduction -->
+      <div>
+        <h3 style="font-weight:700;margin-bottom:.8rem">4. Holt's Graph Reduction Algorithm (General RAG)</h3>
+        <div class="code-block"><span class="tok-cmt">// For single &amp; multi-instance resources</span>
+<span class="tok-fn">function</span> <span class="tok-fn">reduceRAG</span>(processes, resources):
+  Work = Available[]
+  Finished = [<span class="tok-num">false</span>, <span class="tok-num">false</span>, ...]
+
+  <span class="tok-kw">repeat</span>:
+    reducedAny = <span class="tok-num">false</span>
+    <span class="tok-kw">for each</span> P <span class="tok-kw">in</span> processes:
+      <span class="tok-kw">if not</span> Finished[P]:
+        <span class="tok-cmt">// Can all pending requests of P be satisfied?</span>
+        <span class="tok-kw">if</span> Requests(P) &lt;= Work:
+          Work += Assigned(P)  <span class="tok-cmt">// simulate release</span>
+          Finished[P] = <span class="tok-num">true</span>
+          reducedAny = <span class="tok-num">true</span>
+  <span class="tok-kw">until not</span> reducedAny
+
+  <span class="tok-kw">if all</span> Finished[P]:
+    <span class="tok-kw">return</span> <span class="tok-str">NO_DEADLOCK</span>
+  <span class="tok-kw">else</span>:
+    <span class="tok-kw">return</span> <span class="tok-str">DEADLOCK_DETECTED</span>, unreducedProcesses
+</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ CLASSIC EXAMPLES ════════════════════════════════════ -->
+<section class="section section-alt" id="examples">
+  <div class="container">
+    <div class="section-tag">REAL-WORLD EXAMPLES</div>
+    <h2 class="section-title">Classic Deadlock Scenarios</h2>
+    <div class="grid grid-auto-3 mt-4" data-anim>
+      <div class="card card-hover">
+        <div style="font-size:2rem;margin-bottom:.8rem">🍽️</div>
+        <h3 style="font-weight:700;margin-bottom:.5rem">Dining Philosophers</h3>
+        <p style="color:var(--muted);font-size:.875rem;line-height:1.65">
+          5 philosophers sit at a round table. Each needs two chopsticks to eat.
+          If all grab the left chopstick simultaneously — deadlock.
+          <em style="color:var(--text-dim)">Solution: allow at most 4 philosophers at the table, or use asymmetric rules.</em>
+        </p>
+      </div>
+      <div class="card card-hover">
+        <div style="font-size:2rem;margin-bottom:.8rem">🌉</div>
+        <h3 style="font-weight:700;margin-bottom:.5rem">Bridge Crossing Problem</h3>
+        <p style="color:var(--muted);font-size:.875rem;line-height:1.65">
+          A one-lane bridge where cars from both sides enter simultaneously.
+          Neither side can proceed — classic mutual blocking.
+          <em style="color:var(--text-dim)">Solution: traffic light (mutex), preemption (one side backs up).</em>
+        </p>
+      </div>
+      <div class="card card-hover">
+        <div style="font-size:2rem;margin-bottom:.8rem">🗄️</div>
+        <h3 style="font-weight:700;margin-bottom:.5rem">Database Transactions</h3>
+        <p style="color:var(--muted);font-size:.875rem;line-height:1.65">
+          TX-A locks record R1 then requests R2. TX-B locks R2 then requests R1.
+          Both wait forever.
+          <em style="color:var(--text-dim)">Solution: Timeout-based rollback, wound-wait or wait-die protocols.</em>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ CTA ══════════════════════════════════════════════════ -->
+<section class="section" style="text-align:center">
+  <div class="container-sm">
+    <h2 class="section-title">Ready to Practice?</h2>
+    <p class="section-sub" style="margin:0 auto 2rem">
+      Now that you understand the theory, try the interactive tools.
+    </p>
+    <div class="btn-row">
+      <a href="{{ url_for('simulator') }}" class="btn btn-primary btn-lg">🔗 RAG Simulator</a>
+      <a href="{{ url_for('bankers') }}"   class="btn btn-accent btn-lg">🏦 Banker's Algorithm</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

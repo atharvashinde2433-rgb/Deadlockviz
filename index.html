@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+
+{% block title %}DeadlockViz — Deadlock Detection & Visualization System{% endblock %}
+
+{% block content %}
+<!-- ══ HERO ════════════════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <div class="hero-content">
+    <div class="hero-badge fade-up">
+      🎓 Operating Systems · Process Synchronization · CS Education
+    </div>
+    <h1 class="fade-up d1">
+      Deadlock Detection<br/>&amp; Visualization System
+    </h1>
+    <p class="hero-sub fade-up d2">
+      Interactively explore, simulate, and master deadlock — how it occurs,
+      how to detect it, and how to prevent it — through live graphs,
+      animations, and algorithms.
+    </p>
+    <div class="btn-row fade-up d3">
+      <a href="{{ url_for('simulator') }}" class="btn btn-primary btn-xl">
+        🔗 Open RAG Simulator
+      </a>
+      <a href="{{ url_for('bankers') }}" class="btn btn-outline btn-xl">
+        🏦 Banker's Algorithm
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ══ STATS ═══════════════════════════════════════════════ -->
+<section class="section section-alt">
+  <div class="container">
+    <div class="grid grid-auto-4">
+      <div class="stat-card" data-anim>
+        <div class="stat-num"><span data-count="4">4</span></div>
+        <div class="stat-label">Coffman Conditions</div>
+      </div>
+      <div class="stat-card" data-anim>
+        <div class="stat-num"><span data-count="3">3</span></div>
+        <div class="stat-label">Detection Strategies</div>
+      </div>
+      <div class="stat-card" data-anim>
+        <div class="stat-num"><span data-count="2">2</span></div>
+        <div class="stat-label">Interactive Tools</div>
+      </div>
+      <div class="stat-card" data-anim>
+        <div class="stat-num">∞</div>
+        <div class="stat-label">Graph Configurations</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FEATURES ════════════════════════════════════════════ -->
+<section class="section" id="features">
+  <div class="container">
+    <div class="section-tag">WHAT'S INSIDE</div>
+    <h2 class="section-title">Everything You Need to<br/>Master Deadlock</h2>
+    <p class="section-sub">
+      From fundamental theory to hands-on interactive simulations —
+      this system covers all aspects of deadlock in operating systems.
+    </p>
+
+    <div class="grid grid-auto-3 mt-4" data-anim>
+      <div class="feature-card card-hover">
+        <div class="feature-icon icon-primary">📖</div>
+        <h3 class="feature-title">Theory &amp; Concepts</h3>
+        <p class="feature-desc">
+          Deep-dive into Coffman's 4 necessary conditions, deadlock vs livelock,
+          prevention vs avoidance vs detection — with illustrated explanations.
+        </p>
+        <a href="{{ url_for('theory') }}" class="feature-link">Explore Theory →</a>
+      </div>
+
+      <div class="feature-card card-hover">
+        <div class="feature-icon icon-accent">🔗</div>
+        <h3 class="feature-title">RAG Simulator</h3>
+        <p class="feature-desc">
+          Build custom Resource Allocation Graphs with single &amp; multi-instance resources.
+          Run Holt's graph reduction algorithm, full cycle detection, and live Wait-For Graphs.
+        </p>
+        <a href="{{ url_for('simulator') }}" class="feature-link">Try Simulator →</a>
+      </div>
+
+      <div class="feature-card card-hover">
+        <div class="feature-icon icon-success">🏦</div>
+        <h3 class="feature-title">Banker's Algorithm</h3>
+        <p class="feature-desc">
+          Simulate both the Safety Algorithm and Dijkstra's Resource-Request Algorithm.
+          Compute Need matrices, test real-time process requests, and commit allocations.
+        </p>
+        <a href="{{ url_for('bankers') }}" class="feature-link">Try Banker's →</a>
+      </div>
+
+      <div class="feature-card card-hover">
+        <div class="feature-icon icon-warning">🔍</div>
+        <h3 class="feature-title">DFS Cycle Detection</h3>
+        <p class="feature-desc">
+          Understand how depth-first search on the wait-for graph reveals cycles.
+          See which processes are deadlocked, highlighted in real time.
+        </p>
+        <a href="{{ url_for('simulator') }}" class="feature-link">See Detection →</a>
+      </div>
+
+      <div class="feature-card card-hover">
+        <div class="feature-icon icon-info">📊</div>
+        <h3 class="feature-title">Strategy Comparison</h3>
+        <p class="feature-desc">
+          Compare Prevention, Avoidance, Detection &amp; Recovery, and the Ostrich
+          Algorithm across overhead, utilization, and starvation risk metrics.
+        </p>
+        <a href="{{ url_for('theory') }}#strategies" class="feature-link">Compare →</a>
+      </div>
+
+      <div class="feature-card card-hover">
+        <div class="feature-icon icon-danger">💻</div>
+        <h3 class="feature-title">Pseudocode &amp; Algorithms</h3>
+        <p class="feature-desc">
+          Reference implementations of Wait-For Graph construction, DFS cycle
+          detection, and Banker's safety algorithm with colored syntax.
+        </p>
+        <a href="{{ url_for('theory') }}#algorithms" class="feature-link">View Code →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ HOW IT WORKS ════════════════════════════════════════ -->
+<section class="section section-alt" id="how">
+  <div class="container" style="display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center">
+    <div data-anim>
+      <div class="section-tag">WORKFLOW</div>
+      <h2 class="section-title">How Deadlock Detection Works</h2>
+      <p class="section-sub">
+        The system uses a Resource Allocation Graph to model process-resource
+        relationships, then derives a Wait-For Graph and runs DFS cycle detection.
+      </p>
+    </div>
+    <div class="steps-list" data-anim>
+      <div class="step-item">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h4>Build the Resource Allocation Graph</h4>
+          <p>Model processes and resources as nodes. Add request and assignment edges between them.</p>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h4>Derive the Wait-For Graph</h4>
+          <p>Collapse resources: if P1→R→P2, add edge P1→P2 in the simplified wait-for graph.</p>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h4>Run DFS Cycle Detection</h4>
+          <p>Use recursion stack tracking in DFS. A back-edge reveals a cycle = deadlock.</p>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <h4>Report &amp; Recover</h4>
+          <p>Highlight deadlocked processes. Apply recovery: process termination or resource preemption.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ CTA ══════════════════════════════════════════════════ -->
+<section class="section" style="text-align:center">
+  <div class="container-sm" data-anim>
+    <div class="hero-badge" style="margin-bottom:1.3rem">🚀 Ready to get started?</div>
+    <h2 class="section-title">Try the Interactive Tools</h2>
+    <p class="section-sub" style="margin:0 auto 2rem">
+      No setup needed — everything runs in your browser. Start with the
+      RAG Simulator or dive into Banker's Algorithm.
+    </p>
+    <div class="btn-row">
+      <a href="{{ url_for('simulator') }}" class="btn btn-primary btn-lg">🔗 RAG Simulator</a>
+      <a href="{{ url_for('bankers') }}"   class="btn btn-accent btn-lg">🏦 Banker's Algorithm</a>
+      <a href="{{ url_for('theory') }}"    class="btn btn-outline btn-lg">📖 Read Theory</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block title %}DeadlockViz — Resource Allocation Graph Simulator{% endblock %}
+
+{% block content %}
+<!-- ══ PAGE HERO ═══════════════════════════════════════════ -->
+<section style="padding:3.5rem 1.5rem 2.5rem;background:var(--surface);border-bottom:1px solid var(--border);text-align:center">
+  <div class="container-sm">
+    <span class="badge badge-accent badge-lg" style="margin-bottom:1rem">🔗 INTERACTIVE TOOL</span>
+    <h1 style="font-size:clamp(2rem,5vw,2.8rem);font-weight:900;margin-bottom:.8rem;
+      background:linear-gradient(135deg,#c7d2fe,#818cf8,#ec4899);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">
+      Resource Allocation Graph Simulator
+    </h1>
+    <p style="color:var(--muted);font-size:.95rem;max-width:620px;margin:0 auto">
+      Interactively construct processes and single/multi-instance resources, configure request and assignment edges,
+      and run Holt's graph reduction and DFS cycle detection via the Python backend.
+    </p>
+  </div>
+</section>
+
+<!-- ══ SIMULATOR SECTION ════════════════════════════════════ -->
+<section class="section-sm">
+  <div class="container-lg">
+    <div class="grid grid-sidebar" style="align-items:start;gap:1.5rem;">
+      
+      <!-- ── SIDEBAR CONTROLS ──────────────────────────────── -->
+      <aside>
+        <!-- Panel 1: Add Nodes -->
+        <div class="panel">
+          <div class="panel-title">
+            <span>➕</span> Add Graph Nodes
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label" for="proc-name">Process Node (Circle)</label>
+            <div style="display:flex;gap:.5rem;">
+              <input type="text" id="proc-name" class="form-control form-control-sm" placeholder="e.g. P1" maxlength="4"/>
+              <button id="btn-add-proc" class="btn btn-primary btn-sm" style="flex-shrink:0;">+ Process</button>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label" for="res-name">Resource Node (Rectangle)</label>
+            <div style="display:flex;gap:.5rem;align-items:center;">
+              <input type="text" id="res-name" class="form-control form-control-sm" placeholder="e.g. R1" maxlength="4" style="flex:1;"/>
+              <input type="number" id="res-instances" class="form-control form-control-sm" min="1" max="5" value="1" title="Instances (1 to 5 units)" style="width:68px;" placeholder="Units"/>
+              <button id="btn-add-res" class="btn btn-warning btn-sm" style="flex-shrink:0;">+ Resource</button>
+            </div>
+            <span class="text-muted" style="font-size:.74rem;margin-top:.3rem;display:block;">Instance units (1–5 dots inside rectangle)</span>
+          </div>
+        </div>
+
+        <!-- Panel 2: Add Edge -->
+        <div class="panel">
+          <div class="panel-title">
+            <span>🔗</span> Connect Edge
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="edge-from">From Node</label>
+            <select id="edge-from" class="form-control form-control-sm">
+              <option value="">-- Select Node --</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="edge-to">To Node</label>
+            <select id="edge-to" class="form-control form-control-sm">
+              <option value="">-- Select Node --</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="edge-type">Edge Type</label>
+            <select id="edge-type" class="form-control form-control-sm">
+              <option value="request">Request (Process → Resource)</option>
+              <option value="assign">Assignment (Resource → Process)</option>
+            </select>
+          </div>
+
+          <button id="btn-add-edge" class="btn btn-primary btn-sm btn-block mt-2">
+            + Connect Edge
+          </button>
+        </div>
+
+        <!-- Panel 3: Active Nodes List -->
+        <div class="panel">
+          <div class="panel-title" style="justify-content:space-between;">
+            <span><span>🧩</span> Active Nodes</span>
+            <span id="node-count-badge" class="badge badge-primary">0</span>
+          </div>
+          <div id="node-list" class="edge-list" style="max-height:120px;">
+            <p class="text-muted" style="font-size:.8rem;padding:.4rem 0;">No nodes added yet.</p>
+          </div>
+        </div>
+
+        <!-- Panel 4: Edge List -->
+        <div class="panel">
+          <div class="panel-title" style="justify-content:space-between;">
+            <span><span>📋</span> Graph Edges</span>
+          </div>
+          <div id="edge-list" class="edge-list">
+            <p class="text-muted" style="font-size:.8rem;padding:.5rem 0;">No edges added yet.</p>
+          </div>
+        </div>
+
+        <!-- Panel 5: Actions & Presets -->
+        <div class="panel">
+          <div class="panel-title">
+            <span>⚡</span> Simulator Actions &amp; Presets
+          </div>
+          <div style="display:flex;flex-direction:column;gap:.55rem;">
+            <button id="btn-detect" class="btn btn-danger btn-block font-bold">
+              🔍 Detect Deadlock
+            </button>
+            <div class="hr" style="margin:.4rem 0;"></div>
+            <span class="text-muted" style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;">Load Educational Presets:</span>
+            <button id="btn-example-deadlock" class="btn btn-outline btn-sm btn-block">
+              🔄 1-Instance Cycle (Deadlock)
+            </button>
+            <button id="btn-example-cycle-safe" class="btn btn-outline btn-sm btn-block">
+              ⚠️ Multi-Instance Cycle (Safe)
+            </button>
+            <button id="btn-example-multi-deadlock" class="btn btn-outline btn-sm btn-block">
+              🔒 Multi-Instance Deadlock
+            </button>
+            <button id="btn-example-safe" class="btn btn-outline btn-sm btn-block">
+              ✅ Acyclic Safe State
+            </button>
+            <div class="hr" style="margin:.4rem 0;"></div>
+            <button id="btn-reset" class="btn btn-ghost btn-sm btn-block">
+              🗑️ Reset Graph
+            </button>
+            <button id="btn-export" class="btn btn-ghost btn-sm btn-block">
+              📸 Export Image (PNG)
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- ── MAIN CANVAS & RESULTS AREA ────────────────────── -->
+      <main>
+        <!-- Canvas -->
+        <div class="canvas-wrap" style="height:560px;">
+          <canvas id="rag-canvas" style="width:100%;height:100%;"></canvas>
+          <div class="canvas-hint">
+            <span>💡</span> Drag nodes to reposition · Click node to select · Hit Del to remove · Click Detect Deadlock
+          </div>
+        </div>
+
+        <!-- Detection Result Box -->
+        <div id="rag-result" class="card mt-3 hidden">
+          <h3 style="font-size:1rem;font-weight:700;margin-bottom:.8rem;color:var(--text);">
+            Deadlock Detection Result
+          </h3>
+          <div id="rag-result-output"></div>
+        </div>
+
+        <!-- Legend -->
+        <div class="card card-sm mt-3" style="background:var(--surface);">
+          <div style="display:flex;flex-wrap:wrap;gap:1.5rem;align-items:center;font-size:.82rem;color:var(--muted);">
+            <span><strong style="color:var(--primary-light);">● Circle:</strong> Process Node</span>
+            <span><strong style="color:#fbbf24;">■ Rectangle:</strong> Resource Node</span>
+            <span><strong style="color:#4ade80;">● Green Dots:</strong> Allocated Units</span>
+            <span><strong style="color:#e2e8f0;">○ White Dots:</strong> Free Units</span>
+            <span><strong style="color:#94a3b8;">┄ Dashed Arrow:</strong> Request (P → R)</span>
+            <span><strong style="color:#4ade80;">— Solid Arrow:</strong> Assignment (R → P)</span>
+            <span><strong style="color:#f87171;">● Glowing Red:</strong> Deadlocked Node</span>
+          </div>
+        </div>
+      </main>
+
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/rag.js') }}"></script>
+<script src="{{ url_for('static', filename='js/simulator_ui.js') }}"></script>
+{% endblock %}

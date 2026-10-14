@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}DeadlockViz — Deadlock Detection & Visualization System{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔒</text></svg>"/>
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+<!-- ══ NAVBAR ══════════════════════════════════════════════ -->
+<nav class="navbar">
+  <a href="{{ url_for('index') }}" class="nav-brand">
+    <span class="nav-brand-icon">🔒</span>
+    DeadlockViz
+  </a>
+  <ul class="nav-links">
+    <li><a href="{{ url_for('index') }}" class="{% if request.endpoint == 'index' %}active{% endif %}">🏠 Home</a></li>
+    <li><a href="{{ url_for('theory') }}" class="{% if request.endpoint == 'theory' %}active{% endif %}">📖 Theory</a></li>
+    <li><a href="{{ url_for('simulator') }}" class="{% if request.endpoint == 'simulator' %}active{% endif %}">🔗 RAG Simulator</a></li>
+    <li><a href="{{ url_for('bankers') }}" class="{% if request.endpoint == 'bankers' %}active{% endif %}">🏦 Banker's Algorithm</a></li>
+  </ul>
+  <button class="hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- ══ PAGE CONTENT ═════════════════════════════════════════ -->
+<div class="page-wrap">
+  {% block content %}{% endblock %}
+
+  <!-- ══ FOOTER ═══════════════════════════════════════════════ -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div>
+        <div class="footer-brand">🔒 DeadlockViz</div>
+        <div class="footer-text">Deadlock Detection &amp; Visualization System · OS Education</div>
+      </div>
+      <div class="footer-links">
+        <a href="{{ url_for('index') }}">Home</a>
+        <a href="{{ url_for('theory') }}">Theory</a>
+        <a href="{{ url_for('simulator') }}">Simulator</a>
+        <a href="{{ url_for('bankers') }}">Banker's</a>
+      </div>
+    </div>
+  </footer>
+</div><!-- end page-wrap -->
+
+<script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>
